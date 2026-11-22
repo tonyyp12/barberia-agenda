@@ -7,7 +7,16 @@ vm.createContext(context);let source=fs.readFileSync(__dirname+'/../app.js','utf
 vm.runInContext(`
 if(state.clients.length!==1||state.clients[0].phone!=='9991234567'||state.appointments[0].clientId!==state.clients[0].id)throw Error('migration');
 if(normalizePhone('999 123 4567')!=='9991234567')throw Error('phone');
-if(!busy('2099-01-01','10:00')||busy('2099-01-01','11:00'))throw Error('availability');
+render=()=>{};showModal=()=>{};
+const values={customer:'Otro nombre',phone:'9991234567',date:'2099-01-01',time:'11:00'};
+createAppointment({get:k=>values[k]},false);
+if(state.clients.length!==1||state.clients[0].name!=='Cliente conocido'||state.appointments.length!==2)throw Error('client recognition');
+values.time='12:00';createAppointment({get:k=>values[k]},false);
+if(state.appointments.length!==2)throw Error('maximum future bookings');
+values.phone='529991234567';createAppointment({get:k=>values[k]},false);
+if(state.appointments.length!==2)throw Error('country code rejected');
+
+if(!busy('2099-01-01','10:00')||busy('2099-01-01','12:00'))throw Error('availability');
 if(!tabs('notificaciones').includes('aria-current="page"')||!tabs('clientes').includes('Clientes'))throw Error('navigation');
 const candidates=cleanupCandidates({appointments:[{id:'old',date:'2024-01-01',status:'completed'},{id:'rejected',date:'2026-08-01',status:'rejected'},{id:'kept',date:'2026-10-01',status:'confirmed'}],blocks:[{id:'b1',date:'2026-01-01'},{id:'b2',date:'2026-11-20'}]},new Date('2026-11-22T12:00:00'));
 if(candidates.appointments.join(',')!=='old,rejected'||candidates.blocks.join(',')!=='b1')throw Error('retention');
